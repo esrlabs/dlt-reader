@@ -18,12 +18,57 @@ const counters = {
     errors: 0,
 };
 
+const stat: any = {
+    BOOL: 0,
+    FLOA: 0,
+    RAWD: 0,
+    SINT: 0,
+    STRG: 0,
+    TRAI: 0,
+    STRU: 0,
+    UINT: 0,
+    VERB: 0,
+    NON_VERB: 0,
+    NON_PAYLOAD: 0,
+    UNDEFINED: 0,
+};
+
 const errors: string[] = [];
+
+function publishStat() {
+    let str: string = '';
+    Object.keys(stat).forEach((key: string) => {
+        str += `${key}: ${stat[key]}; `;
+    });
+    stdout.out(str, 'stat');
+
+}
 
 dltbuffer.on(DLT.Buffer.Events.packet, (packet: DLT.IPacketData) => {
     counters.size += packet.length;
     stdout.out(`Packet: ${packet.length} bytes;\tWSID: ${packet.standardHeader.WSID};\tWTMS: ${packet.standardHeader.WTMS};\tWEID: ${packet.standardHeader.WEID};\tEID: ${packet.standardHeader.EID};\tMCNT: ${packet.standardHeader.MCNT}`);
     stdout.out(`Packages read: ${++counters.packets}; ${counters.size} bytes; errors: ${counters.errors}`, 'done');
+    if (packet.extendedHeader === undefined) {
+        stat.NON_VERB += 1;
+        return publishStat();
+    }
+    if (!packet.extendedHeader.VERB) {
+        stat.NON_VERB += 1;
+        return publishStat();
+    }
+    stat.VERB += 1;
+    if (packet.payload === undefined || packet.payload.content.length === 0) {
+        stat.NON_PAYLOAD += 1;
+        return publishStat();
+    }
+    packet.payload.content.forEach((arg: DLT.IArgumentValue) => {
+        if (stat[arg.type] === undefined) {
+            stat.UNDEFINED += 1;
+        } else {
+            stat[arg.type] += 1;
+        }
+    });
+    return publishStat();
 });
 
 dltbuffer.on(DLT.Buffer.Events.error, (error: DLT.Error) => {
