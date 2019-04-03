@@ -1,7 +1,8 @@
 import { Buffer } from 'buffer';
 import * as PayloadConsts from './dlt.payload.arguments.consts';
+import { ABufferReader } from './interfaces/interface.dlt.payload.argument.type.processor';
 
-export default class PayloadArgumentTypeInfo{
+export default class PayloadArgumentTypeInfo extends ABufferReader {
 
     public TYLE: boolean;
     public BOOL: boolean;
@@ -24,8 +25,9 @@ export default class PayloadArgumentTypeInfo{
 
     private _value: number;
 
-    constructor(buffer: Buffer) {
-        this._value = buffer.readUInt32LE(0);
+    constructor(buffer: Buffer, MSBF: boolean) {
+        super(buffer, MSBF);
+        this._value = this.readUInt32();
         this.TYLE = (this._value & PayloadConsts.Flags.TYLE) !== 0;
         this.BOOL = (this._value & PayloadConsts.Flags.BOOL) !== 0;
         this.SINT = (this._value & PayloadConsts.Flags.SINT) !== 0;

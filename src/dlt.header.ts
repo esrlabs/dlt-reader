@@ -28,7 +28,7 @@ export default class Header {
         // Get extended header (if it's defiend)
         if (this.standard.UEH) {
             // Create extended header
-            this.extended = new Extended.Header(this._buffer);
+            this.extended = new Extended.Header(this._buffer.slice(this._offset, this._buffer.length));
             // Try to read
             const readExtendedHeaderError: Error | undefined = this.extended.read();
             if (readExtendedHeaderError instanceof Error) {

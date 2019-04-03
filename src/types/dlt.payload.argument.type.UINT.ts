@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import * as PayloadConsts from '../dlt.payload.arguments.consts';
 import TypeInfo from '../dlt.payload.argument.type.info';
-import { IPayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
+import { APayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
 
 export interface IData {
     value: number;
@@ -15,15 +15,10 @@ interface IPointData {
     bufferOffset: number;
 }
 
-export default class UINT implements IPayloadTypeProcessor<IData> {
+export default class UINT extends APayloadTypeProcessor<IData> {
 
-    private _buffer: Buffer;
-    private _info: TypeInfo;
-    private _offset: number = 0;
-
-    constructor(buffer: Buffer, info: TypeInfo) {
-        this._buffer = buffer;
-        this._info = info;
+    constructor(buffer: Buffer, info: TypeInfo, MSBF: boolean) {
+        super(buffer, info, MSBF);
     }
 
     public read(): IData | Error {
@@ -36,8 +31,15 @@ export default class UINT implements IPayloadTypeProcessor<IData> {
             // TODO: implementation for this case
             // return result;
         }
-        result.value = this._buffer.readUIntLE(0, this._info.TYLEValue);
-        this._offset += this._info.TYLEValue;
+        let byteCount: number = 1;
+        switch (this._info.TYLEValue) {
+            case 1: byteCount = 1; break;
+            case 2: byteCount = 2; break;
+            case 3: byteCount = 4; break;
+            case 4: byteCount = 8; break;
+            case 5: byteCount = 16; break;
+        }
+        result.value = this.readInt(byteCount);
         return result;
     }
 
@@ -51,18 +53,16 @@ export default class UINT implements IPayloadTypeProcessor<IData> {
         if (!this._info.VARI) {
             return { name: undefined, unit: undefined };
         }
-        name.length = this._buffer.readUInt16LE(0);
-        this._offset += 2;
-        unit.length = this._buffer.readUInt16LE(this._offset);
-        this._offset += 2;
+        name.length = this.readUInt16();
+        unit.length = this.readUInt16();
         name.value = this._buffer.slice(this._offset, this._offset + name.length).toString('ascii');
         this._offset += name.length;
         unit.value = this._buffer.slice(this._offset, this._offset + unit.length).toString('ascii');
         this._offset += unit.length;
         return {
             name: name.value,
-            unit: unit.value
-        }
+            unit: unit.value,
+        };
     }
 
     private _getPoint(): IPointData {
@@ -70,22 +70,18 @@ export default class UINT implements IPayloadTypeProcessor<IData> {
         if (!this._info.FIXP) {
             return result;
         }
-        result.quantization = this._buffer.readFloatLE(this._offset);
-        this._offset += 4;
+        result.quantization = this.readFloat();
         switch (this._info.TYLEValue) {
             case 1:
             case 2:
             case 3:
-                result.offset = this._buffer.readUIntLE(this._offset, 4);
-                this._offset += 4;
+                result.offset = this.readUInt(4);
                 break;
             case 4:
-                result.offset = this._buffer.readUIntLE(this._offset, 8);
-                this._offset += 8;
+                result.offset = this.readUInt(8);
                 break;
             case 5:
-                result.offset = this._buffer.readUIntLE(this._offset, 16);
-                this._offset += 16;
+                result.offset = this.readUInt(16);
                 break;
         }
         return result;

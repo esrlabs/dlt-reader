@@ -24,12 +24,13 @@ export default class Payload {
     constructor(buffer: Buffer, header: Header) {
         this._buffer = buffer;
         this._header = header;
+        const MSBF: boolean = (this._header.standard as Standard.Header).MSBF;
         if (this._header.extended === undefined || !this._header.extended.VERB) {
             this.mode = EMode.NON_VERBOSE;
-            this._processor = new PayloadNonVerbose(this._buffer);
+            this._processor = new PayloadNonVerbose(this._buffer, MSBF);
         } else {
             this.mode = EMode.VERBOSE;
-            this._processor = new PayloadVerbose(this._buffer, this._header.extended.NOAR);
+            this._processor = new PayloadVerbose(this._buffer, this._header.extended.NOAR, MSBF);
         }
     }
 

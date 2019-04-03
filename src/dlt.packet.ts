@@ -48,6 +48,6 @@ export default class Packet {
     }
 
     public crop(): Buffer {
-        return this._buffer.slice(0, this._length);
+        return this._buffer.slice(this._length, this._buffer.length);
     }
 }

@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import * as PayloadConsts from './dlt.payload.arguments.consts';
 import TypeInfo from './dlt.payload.argument.type.info';
-import { IPayloadTypeProcessor } from './interfaces/interface.dlt.payload.argument.type.processor';
+import { APayloadTypeProcessor } from './interfaces/interface.dlt.payload.argument.type.processor';
 
 import BOOL from './types/dlt.payload.argument.type.BOOL';
 import FLOA from './types/dlt.payload.argument.type.FLOA';
@@ -38,15 +38,17 @@ export default class PayloadArgument {
     private _buffer: Buffer;
     private _info: TypeInfo | undefined;
     private _offset: number = 0;
-    private _processor: IPayloadTypeProcessor<any> | undefined;
+    private _MSBF: boolean; // MSB First: true - payload BE; false - payload LE
+    private _processor: APayloadTypeProcessor<any> | undefined;
 
-    constructor(buffer: Buffer) {
+    constructor(buffer: Buffer, MSBF: boolean) {
         this._buffer = buffer;
+        this._MSBF = MSBF;
     }
 
     public read(): IArgumentData | Error {
         // Get type info
-        this._info = new TypeInfo(this._buffer);
+        this._info = new TypeInfo(this._buffer, this._MSBF);
         this._offset += 4;
         // Get value
         const buffer: Buffer = this._buffer.slice(this._offset, this._buffer.length);
@@ -55,7 +57,7 @@ export default class PayloadArgument {
             return new Error(`Cannot find processor for type "${this._info.type}".`);
         }
         // Create processor
-        this._processor = new Processors[this._info.type](buffer, this._info) as IPayloadTypeProcessor<any>;
+        this._processor = new Processors[this._info.type](buffer, this._info, this._MSBF) as APayloadTypeProcessor<any>;
         // Read data
         const data: any = this._processor.read();
         if (data instanceof Error) {

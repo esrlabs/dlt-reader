@@ -11,22 +11,24 @@ export default class PayloadVerbose {
 
     private _buffer: Buffer;
     private _NOAR: number;
+    private _MSBF: boolean; // MSB First: true - payload BE; false - payload LE
 
-    constructor(buffer: Buffer, NOAR: number) {
+    constructor(buffer: Buffer, NOAR: number, MSBF: boolean) {
         this._buffer = buffer;
         this._NOAR = NOAR; // Count of expected arguments
+        this._MSBF = MSBF;
     }
 
     public read(): IArgumentValue[] | Error {
         // Calculate minimal size of buffer. Size of TypeInfo is 4 bytes; TypeInfo should be presend for each argument
         const minSize: number = 4 * this._NOAR;
         // Check length of buffer
-        if (this._buffer.byteLength < minSize) {
-            return new Error(`NOAR is ${this._NOAR}, but size of buffer is ${this._buffer.byteLength} bytes. Minimal size requered: ${minSize} bytes.`);
+        if (this._buffer.length < minSize) {
+            return new Error(`NOAR is ${this._NOAR}, but size of buffer is ${this._buffer.length} bytes. Minimal size requered: ${minSize} bytes.`);
         }
         const result: IArgumentValue[] = [];
         do {
-            const argument: PayloadArgument = new PayloadArgument(this._buffer);
+            const argument: PayloadArgument = new PayloadArgument(this._buffer, this._MSBF);
             const data: IArgumentData | Error = argument.read();
             if (data instanceof Error) {
                 return data;

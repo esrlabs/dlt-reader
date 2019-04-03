@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import * as PayloadConsts from '../dlt.payload.arguments.consts';
 import TypeInfo from '../dlt.payload.argument.type.info';
-import { IPayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
+import { APayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
 
 export interface IData {
     value: number;
@@ -15,15 +15,10 @@ interface IPointData {
     bufferOffset: number;
 }
 
-export default class FLOA implements IPayloadTypeProcessor<IData> {
+export default class FLOA extends APayloadTypeProcessor<IData> {
 
-    private _buffer: Buffer;
-    private _info: TypeInfo;
-    private _offset: number = 0;
-
-    constructor(buffer: Buffer, info: TypeInfo) {
-        this._buffer = buffer;
-        this._info = info;
+    constructor(buffer: Buffer, info: TypeInfo, MSBF: boolean) {
+        super(buffer, info, MSBF);
     }
 
     public read(): IData | Error {
@@ -32,22 +27,19 @@ export default class FLOA implements IPayloadTypeProcessor<IData> {
         result.name = names.name;
         result.unit = names.unit;
         switch (this._info.TYLEValue) {
-            case 1: 
+            case 1:
                 // TODO: what is here? page: 87
                 break;
-            case 2: 
-                result.value = this._toFloat16(this._buffer.readIntLE(this._offset, 2));
-                this._offset += 2;
+            case 2:
+                result.value = this._toFloat16(this.readInt(2));
                 break;
             case 3:
-                result.value = this._buffer.readFloatLE(this._offset);
-                this._offset += 4;
+                result.value = this.readFloat();
                 break;
             case 4:
-                result.value = this._buffer.readDoubleLE(this._offset);
-                this._offset += 8;
+                result.value = this.readDouble();
                 break;
-            case 5: 
+            case 5:
                 // TODO: add support float 128
                 result.value = 0;
                 this._offset += 16;
@@ -66,32 +58,30 @@ export default class FLOA implements IPayloadTypeProcessor<IData> {
         if (!this._info.VARI) {
             return { name: undefined, unit: undefined };
         }
-        name.length = this._buffer.readUInt16LE(0);
-        this._offset += 2;
-        unit.length = this._buffer.readUInt16LE(this._offset);
-        this._offset += 2;
+        name.length = this.readUInt16();
+        unit.length = this.readUInt16();
         name.value = this._buffer.slice(this._offset, this._offset + name.length).toString('ascii');
         this._offset += name.length;
         unit.value = this._buffer.slice(this._offset, this._offset + unit.length).toString('ascii');
         this._offset += unit.length;
         return {
             name: name.value,
-            unit: unit.value
-        }
+            unit: unit.value,
+        };
     }
 
-    private _toFloat16 (binary: number): number {
+    private _toFloat16(binary: number): number {
         // https://stackoverflow.com/questions/5678432/decompressing-half-precision-floats-in-javascript
         const s = (binary & 0x8000) >> 15;
         const e = (binary & 0x7C00) >> 10;
         const f = binary & 0x03FF;
 
-        if(e == 0) {
-            return (s?-1:1) * Math.pow(2,-14) * (f/Math.pow(2, 10));
-        } else if (e == 0x1F) {
-            return f?NaN:((s?-1:1)*Infinity);
+        if (e === 0) {
+            return (s ? -1 : 1) * Math.pow(2, -14) * (f / Math.pow(2, 10));
+        } else if (e === 0x1F) {
+            return f ? NaN : ((s ? -1 : 1) * Infinity);
         }
-        return (s?-1:1) * Math.pow(2, e-15) * (1+(f/Math.pow(2, 10)));
+        return (s ? -1 : 1) * Math.pow(2, e - 15) * (1 + (f / Math.pow(2, 10)));
     }
 
 }

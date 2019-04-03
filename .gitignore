@@ -63,4 +63,5 @@ typings/
 # mac
 .DS_Store
 __docs
+dist
 TODO

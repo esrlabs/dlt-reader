@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import { ABufferReader } from './interfaces/interface.dlt.payload.argument.type.processor';
 
 export const Parameters = {
     MIN_LEN: 10,
@@ -7,6 +8,9 @@ export const Parameters = {
 
 export const HeaderExtendedFlags = {
     VERB: 0b00000001,
+};
+
+export const HeaderExtendedMasks = {
     MSTP: 0b00001110,
     MTIN: 0b11110000,
 };
@@ -83,7 +87,7 @@ const MTINMap: { [key: string]: { [key: number]: EMTIN } } = {
     },
 };
 
-export class Header {
+export class Header extends ABufferReader {
 
     public MSIN: number = -1;               // Message Info
     public VERB: boolean = false;           // Verbose
@@ -93,35 +97,30 @@ export class Header {
     public APID: string = '';               // Application ID
     public CTID: string = '';               // Context ID
 
-    private _buffer: Buffer;
-    private _offset: number = 0;
-
     constructor(buffer: Buffer) {
-        this._buffer = buffer;
+        super(buffer, true);
     }
 
     public read(): Error | undefined {
         // Check minimal size
         if (this._buffer.length < Parameters.MIN_LEN) {
-            return new Error(`Minimal length of extended header is ${Parameters.MIN_LEN} bytes, but size of buffer is ${this._buffer.byteLength} bytes.`);
+            return new Error(`Minimal length of extended header is ${Parameters.MIN_LEN} bytes, but size of buffer is ${this._buffer.length} bytes.`);
         }
         // Reading
-        this.MSIN = this._buffer.readUInt8(this._offset);
-        this._offset += 1;
+        this.MSIN = this.readUInt8();
         this.VERB = (this.MSIN & HeaderExtendedFlags.VERB) !== 0;
-        const MSTPValue: number = (this.MSIN & HeaderExtendedFlags.MSTP) >> 1;
+        const MSTPValue: number = (this.MSIN & HeaderExtendedMasks.MSTP) >> 1;
         if (MSTPMap[MSTPValue] !== undefined) {
             this.MSTP = MSTPMap[MSTPValue];
         }
         const MTINRelatedMap: { [key: number]: EMTIN } = MTINMap[this.MSTP];
         if (MTINRelatedMap !== undefined) {
-            const MTINValue: number  = (this.MSIN & HeaderExtendedFlags.MTIN) >> 4;
+            const MTINValue: number  = (this.MSIN & HeaderExtendedMasks.MTIN) >> 4;
             if (MTINRelatedMap[MTINValue] !== undefined) {
                 this.MTIN = MTINRelatedMap[MTINValue];
             }
         }
-        this.NOAR = this._buffer.readUInt8(this._offset);
-        this._offset += 1;
+        this.NOAR = this.readUInt8();
         this.APID = this._buffer.slice(this._offset, this._offset + 4).toString('ascii');
         this._offset += 4;
         this.CTID = this._buffer.slice(this._offset, this._offset + 4).toString('ascii');

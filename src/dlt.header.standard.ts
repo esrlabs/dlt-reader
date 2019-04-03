@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import { ABufferReader } from './interfaces/interface.dlt.payload.argument.type.processor';
 
 export const Parameters = {
     MIN_LEN: 4,
@@ -17,10 +18,10 @@ export const HeaderStandardMasks = {
     VERS: 0b11100000,
 };
 
-export class Header {
+export class Header extends ABufferReader {
 
     public UEH:     boolean = false;  // Use Extended Header
-    public MSBF:    boolean = false;  // MSB First
+    public MSBF:    boolean = false;  // MSB First: true - payload BE; false - payload LE
     public WEID:    boolean = false;  // With ECU ID
     public WSID:    boolean = false;  // With Session ID
     public WTMS:    boolean = false;  // With Timestamp
@@ -31,37 +32,27 @@ export class Header {
     public SID:     number = -1;      // Session ID
     public TMS:     number = -1;      // Timestamp
 
-    private _buffer: Buffer;
-    private _offset: number = 0;
-
     constructor(buffer: Buffer) {
-        this._buffer = buffer;
+        super(buffer, true);
     }
 
     public read(): Error | undefined {
         if (this._buffer.length < Parameters.MIN_LEN) {
-            return new Error(`Minimal length of standard header is ${Parameters.MIN_LEN} bytes, but size of buffer is ${this._buffer.byteLength} bytes.`);
+            return new Error(`Minimal length of standard header is ${Parameters.MIN_LEN} bytes, but size of buffer is ${this._buffer.length} bytes.`);
         }
-        const content = this._buffer.readUInt8(this._offset);
+        const content = this.readUInt8();
         // Check structure of header: what header includes
         ['UEH', 'MSBF', 'WEID', 'WSID', 'WTMS'].forEach((key: string) => {
             (this as any)[key] = (content & (HeaderStandardFlags as any)[key]) !== 0;
         });
         // Get version of protocol
         this.VERS = (content & HeaderStandardMasks.VERS) >> 5;
-        this._offset += 1;
         // Get message counter
-        this.MCNT = this._buffer.readUInt8(this._offset);
-        this._offset += 1;
+        this.MCNT = this.readUInt8();
         // Get length
-        this.LEN = this._buffer.readUInt16LE(this._offset);
-        this._offset += 2;
-        // Calculate length of whole header
-        let length = this._offset;
-        if (this.WEID) { length += 4; }
-        if (this.WSID) { length += 4; }
-        if (this.WTMS) { length += 4; }
-        if (this._buffer.byteLength < length) {
+        this.LEN = this.readUInt16();
+        // Check length of whole packet
+        if (this._buffer.length < this.LEN) {
             return new Error(`Expected size of header is bigger than buffer. Some of parameters are defiend (WEID, WSID, WTMS), but no data in buffer.`);
         }
         // Check ECU ID (WEID)
@@ -71,13 +62,11 @@ export class Header {
         }
         // Check session Id (WSID)
         if (this.WSID) {
-            this.SID = this._buffer.readUInt32LE(this._offset);
-            this._offset += 4;
+            this.SID = this.readUInt32();
         }
         // Check timestamp (WTMS)
         if (this.WTMS) {
-            this.TMS = this._buffer.readUInt32LE(this._offset);
-            this._offset += 4;
+            this.TMS = this.readUInt32();
         }
     }
 

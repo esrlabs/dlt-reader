@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import * as PayloadConsts from '../dlt.payload.arguments.consts';
 import TypeInfo from '../dlt.payload.argument.type.info';
-import { IPayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
+import { APayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
 
 export interface IData {
     value: Buffer;
@@ -9,21 +9,15 @@ export interface IData {
     count: number;
 }
 
-export default class STRG implements IPayloadTypeProcessor<IData> {
+export default class STRG extends APayloadTypeProcessor<IData> {
 
-    private _buffer: Buffer;
-    private _info: TypeInfo;
-    private _offset: number = 0;
-
-    constructor(buffer: Buffer, info: TypeInfo) {
-        this._buffer = buffer;
-        this._info = info;
+    constructor(buffer: Buffer, info: TypeInfo, MSBF: boolean) {
+        super(buffer, info, MSBF);
     }
 
     public read(): IData | Error {
         const result: IData = { value: new Buffer(0), count: 0, name: undefined };
-        result.count = this._buffer.readUInt16LE(this._offset);
-        this._offset += 2;
+        result.count = this.readUInt16();
         result.name = this._getName();
         // Here is implementation
         this._offset += length;
@@ -38,8 +32,7 @@ export default class STRG implements IPayloadTypeProcessor<IData> {
         if (!this._info.VARI) {
             return undefined;
         }
-        const length = this._buffer.readUInt16LE(0);
-        this._offset += 2;
+        const length = this.readUInt16();
         const value = this._buffer.slice(this._offset, this._offset + length).toString('ascii');
         this._offset += length;
         return value;

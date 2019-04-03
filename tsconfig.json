@@ -16,6 +16,6 @@
     }
   },
   "files": [
-    "./src/dlt.buffer.ts"
+    "./src/index.ts"
   ]
 }

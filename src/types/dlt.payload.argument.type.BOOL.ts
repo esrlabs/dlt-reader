@@ -1,32 +1,26 @@
 import { Buffer } from 'buffer';
 import * as PayloadConsts from '../dlt.payload.arguments.consts';
 import TypeInfo from '../dlt.payload.argument.type.info';
-import { IPayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
+import { APayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
 
 export interface IData {
     value: boolean;
     name: string | undefined;
 }
 
-export default class BOOL implements IPayloadTypeProcessor<IData> {
+export default class BOOL extends APayloadTypeProcessor<IData> {
 
-    private _buffer: Buffer;
-    private _info: TypeInfo;
-    private _offset: number = 0;
-
-    constructor(buffer: Buffer, info: TypeInfo) {
-        this._buffer = buffer;
-        this._info = info;
+    constructor(buffer: Buffer, info: TypeInfo, MSBF: boolean) {
+        super(buffer, info, MSBF);
     }
 
     public read(): IData | Error {
         const name: string | undefined = this._getName();
-        const value: boolean = this._buffer.readUInt8(this._offset) === 1;
-        this._offset += 1;
+        const value: boolean = this.readUInt8() === 1;
         return {
             value: value,
-            name: name
-        }
+            name: name,
+        };
     }
 
     public crop(): Buffer {
@@ -37,8 +31,7 @@ export default class BOOL implements IPayloadTypeProcessor<IData> {
         if (!this._info.VARI) {
             return undefined;
         }
-        const length = this._buffer.readUInt16LE(0);
-        this._offset += 2;
+        const length = this.readUInt16();
         const value = this._buffer.slice(this._offset, this._offset + length).toString('ascii');
         this._offset += length;
         return value;
