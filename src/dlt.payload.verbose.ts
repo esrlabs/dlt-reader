@@ -31,19 +31,20 @@ export default class PayloadVerbose {
         do {
             if (this._buffer.length === 0 && result.length !== this._NOAR) {
                 return new DLTError(`Buffer is over, but not all arguments are parsed.`, EErrorCode.NOT_ALL_ARGS_PARSED);
-            } else if (this._buffer.length === 0 || result.length !== this._NOAR) {
+            } else if (this._buffer.length === 0 || result.length === this._NOAR) {
                 break;
+            } else {
+                const argument: PayloadArgument = new PayloadArgument(this._buffer, this._MSBF);
+                const data: IArgumentData | DLTError = argument.read();
+                if (data instanceof DLTError) {
+                    return data;
+                }
+                this._buffer = data.cropped;
+                result.push({
+                    type: data.type,
+                    data: data.data,
+                });
             }
-            const argument: PayloadArgument = new PayloadArgument(this._buffer, this._MSBF);
-            const data: IArgumentData | DLTError = argument.read();
-            if (data instanceof DLTError) {
-                return data;
-            }
-            this._buffer = data.cropped;
-            result.push({
-                type: data.type,
-                data: data.data,
-            });
         } while (this._buffer.length > 0 || result.length < this._NOAR);
         return result;
     }
