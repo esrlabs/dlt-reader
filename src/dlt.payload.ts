@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import Header, { Standard, Extended } from './dlt.header';
 import PayloadNonVerbose from './dlt.payload.nonverbose';
-import PayloadVerbose from './dlt.payload.verbose';
+import PayloadVerbose, { IArgumentValue } from './dlt.payload.verbose';
 import { DLTError, EErrorCode } from './dlt.error';
 
 export enum EMode {
@@ -11,7 +11,7 @@ export enum EMode {
 
 export interface IPayloadData {
     mode: EMode;
-    content: any;
+    content: IArgumentValue[];
 }
 
 export default class Payload {

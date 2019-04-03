@@ -19,6 +19,21 @@ export const HeaderStandardMasks = {
     VERS: 0b11100000,
 };
 
+/**
+ * @class Header
+ * @classdesc StandardHeader
+ * @property {boolean}  UEH     - Has Extended Header
+ * @property {boolean}  MSBF    - MSB First: true - payload BE; false - payload LE
+ * @property {boolean}  WEID    - Has ECU ID
+ * @property {boolean}  WSID    - Has Session ID
+ * @property {boolean}  WTMS    - Has Timestamp
+ * @property {number}   VERS    - Version Number
+ * @property {number}   MCNT    - Message Counter
+ * @property {number}   LEN     - Length of the complete message in bytes
+ * @property {number}   SID     - Session ID
+ * @property {number}   TMS     - Timestamp
+ * @property {string}   EID     - ECU ID (ECU)
+ */
 export class Header extends ABufferReader {
 
     public UEH:     boolean = false;  // Use Extended Header

@@ -2,7 +2,7 @@ import Buffer, { IPacketData } from './dlt.buffer';
 import Header, { Standard, Extended } from './dlt.header';
 import Payload, { IPayloadData } from './dlt.payload';
 import PayloadNonVerbose from './dlt.payload.nonverbose';
-import PayloadVerbose from './dlt.payload.verbose';
+import PayloadVerbose, { IArgumentValue } from './dlt.payload.verbose';
 import PayloadArgument, { IArgumentData } from './dlt.payload.argument';
 import TypeInfo from './dlt.payload.argument.type.info';
 import BOOL from './types/dlt.payload.argument.type.BOOL';
@@ -28,6 +28,7 @@ export {
     PayloadVerbose,
     PayloadArgument,
     IArgumentData,
+    IArgumentValue,
     PayloadConsts,
     TypeInfo,
     BOOL,
