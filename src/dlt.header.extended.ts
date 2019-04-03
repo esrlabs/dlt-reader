@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import { ABufferReader } from './interfaces/interface.dlt.payload.argument.type.processor';
+import { DLTError, EErrorCode } from './dlt.error';
 
 export const Parameters = {
     MIN_LEN: 10,
@@ -101,10 +102,10 @@ export class Header extends ABufferReader {
         super(buffer, true);
     }
 
-    public read(): Error | undefined {
+    public read(): DLTError | undefined {
         // Check minimal size
         if (this._buffer.length < Parameters.MIN_LEN) {
-            return new Error(`Minimal length of extended header is ${Parameters.MIN_LEN} bytes, but size of buffer is ${this._buffer.length} bytes.`);
+            return new DLTError(`Minimal length of extended header is ${Parameters.MIN_LEN} bytes, but size of buffer is ${this._buffer.length} bytes.`, EErrorCode.HEADER_MIN_LEN);
         }
         // Reading
         this.MSIN = this.readUInt8();

@@ -1,6 +1,7 @@
 import { Buffer } from 'buffer';
 import Header, { Standard, Extended } from './dlt.header';
 import Payload, { IPayloadData } from './dlt.payload';
+import { DLTError, EErrorCode } from './dlt.error';
 
 export interface IPacketData {
     standardHeader: Standard.Header;
@@ -18,16 +19,16 @@ export default class Packet {
         this._buffer = buffer;
     }
 
-    public read(): IPacketData | Error {
+    public read(): IPacketData | DLTError {
         // Create header
         const header: Header = new Header(this._buffer);
         // Try to read header
-        const headerReadingError: Error | undefined = header.read();
-        if (headerReadingError instanceof Error) {
+        const headerReadingError: DLTError | undefined = header.read();
+        if (headerReadingError instanceof DLTError) {
             return headerReadingError;
         }
         if (header.standard === undefined) {
-            return new Error(`Fail to read standard header. This message is a signal: parser has some error, because this message should not appear at all. Never.`);
+            return new DLTError(`Fail to read standard header. This message is a signal: parser has some error, because this message should not appear at all. Never.`, EErrorCode.UNKNOWN);
         }
         this._length = header.standard.LEN;
         // Extract message bytes
@@ -35,8 +36,8 @@ export default class Packet {
         // Create payload processor
         const processor: Payload = new Payload(payloadBuffer, header);
         // Read payload data
-        const payload: IPayloadData | Error = processor.read();
-        if (payload instanceof Error) {
+        const payload: IPayloadData | DLTError = processor.read();
+        if (payload instanceof DLTError) {
             return payload;
         }
         return {

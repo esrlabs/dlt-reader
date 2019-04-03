@@ -1,32 +1,40 @@
 import { Buffer } from 'buffer';
 import * as PayloadConsts from './dlt.payload.arguments.consts';
 import { ABufferReader } from './interfaces/interface.dlt.payload.argument.type.processor';
+import { DLTError, EErrorCode } from './dlt.error';
 
 export default class PayloadArgumentTypeInfo extends ABufferReader {
 
-    public TYLE: boolean;
-    public BOOL: boolean;
-    public SINT: boolean;
-    public UINT: boolean;
-    public FLOA: boolean;
-    public ARAY: boolean;
-    public STRG: boolean;
-    public RAWD: boolean;
-    public VARI: boolean;
-    public FIXP: boolean;
-    public TRAI: boolean;
-    public STRU: boolean;
-    public SCOD: boolean;
+    public TYLE: boolean = false;
+    public BOOL: boolean = false;
+    public SINT: boolean = false;
+    public UINT: boolean = false;
+    public FLOA: boolean = false;
+    public ARAY: boolean = false;
+    public STRG: boolean = false;
+    public RAWD: boolean = false;
+    public VARI: boolean = false;
+    public FIXP: boolean = false;
+    public TRAI: boolean = false;
+    public STRU: boolean = false;
+    public SCOD: boolean = false;
 
-    public TYLEValue: number;
+    public TYLEValue: number = 0;
     public SCODValue: number | undefined;
 
     public type: PayloadConsts.EType = PayloadConsts.EType.UNDEFINED;
 
-    private _value: number;
+    private _value: number = 0;
 
     constructor(buffer: Buffer, MSBF: boolean) {
         super(buffer, MSBF);
+    }
+
+    public read(): DLTError | undefined {
+        // Check length
+        if (this._buffer.length < 4) {
+            return new DLTError(`Length of buffer small as required to read TypeInfo. Length of buffer: ${this._buffer.length}; required: 4.`, EErrorCode.TYPE_INFO_LEN);
+        }
         this._value = this.readUInt32();
         this.TYLE = (this._value & PayloadConsts.Flags.TYLE) !== 0;
         this.BOOL = (this._value & PayloadConsts.Flags.BOOL) !== 0;

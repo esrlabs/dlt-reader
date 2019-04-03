@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import { ABufferReader } from './interfaces/interface.dlt.payload.argument.type.processor';
+import { DLTError, EErrorCode } from './dlt.error';
 
 export const Parameters = {
     MIN_LEN: 4,
@@ -36,9 +37,9 @@ export class Header extends ABufferReader {
         super(buffer, true);
     }
 
-    public read(): Error | undefined {
+    public read(): DLTError | undefined {
         if (this._buffer.length < Parameters.MIN_LEN) {
-            return new Error(`Minimal length of standard header is ${Parameters.MIN_LEN} bytes, but size of buffer is ${this._buffer.length} bytes.`);
+            return new DLTError(`Minimal length of standard header is ${Parameters.MIN_LEN} bytes, but size of buffer is ${this._buffer.length} bytes.`, EErrorCode.HEADER_MIN_LEN);
         }
         const content = this.readUInt8();
         // Check structure of header: what header includes
@@ -53,7 +54,7 @@ export class Header extends ABufferReader {
         this.LEN = this.readUInt16();
         // Check length of whole packet
         if (this._buffer.length < this.LEN) {
-            return new Error(`Expected size of header is bigger than buffer. Some of parameters are defiend (WEID, WSID, WTMS), but no data in buffer.`);
+            return new DLTError(`Expected size of header is bigger than buffer. Some of parameters are defiend (WEID, WSID, WTMS), but no data in buffer.`, EErrorCode.PACKET_LEN);
         }
         // Check ECU ID (WEID)
         if (this.WEID) {

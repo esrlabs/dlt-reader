@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import { DLTError, EErrorCode } from './dlt.error';
 
 export default class PayloadNonVerbose {
 

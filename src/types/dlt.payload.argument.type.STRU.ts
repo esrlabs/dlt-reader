@@ -2,6 +2,7 @@ import { Buffer } from 'buffer';
 import * as PayloadConsts from '../dlt.payload.arguments.consts';
 import TypeInfo from '../dlt.payload.argument.type.info';
 import { APayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
+import { DLTError, EErrorCode } from '../dlt.error';
 
 export interface IData {
     value: Buffer;
@@ -15,7 +16,7 @@ export default class STRG extends APayloadTypeProcessor<IData> {
         super(buffer, info, MSBF);
     }
 
-    public read(): IData | Error {
+    public read(): IData | DLTError {
         const result: IData = { value: new Buffer(0), count: 0, name: undefined };
         result.count = this.readUInt16();
         result.name = this._getName();

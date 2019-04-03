@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import { Buffer } from 'buffer';
 import Packet, { IPacketData } from './dlt.packet';
+import { DLTError, EErrorCode } from './dlt.error';
 
 export { IPacketData };
 
@@ -19,10 +20,10 @@ export default class DLTBuffer extends EventEmitter {
 
     public add(buffer: Buffer) {
         this._buffer = Buffer.concat([this._buffer, buffer]);
-        let error: Error | undefined;
+        let error: DLTError | undefined;
         do {
             error = this._read();
-            if (error instanceof Error) {
+            if (error instanceof DLTError) {
                 this.emit(DLTBuffer.Events.error, error);
                 break;
             }
@@ -32,10 +33,10 @@ export default class DLTBuffer extends EventEmitter {
         } while (true);
     }
 
-    private _read(): Error | undefined {
+    private _read(): DLTError | undefined {
         const processor: Packet = new Packet(this._buffer);
-        const packet: IPacketData | Error = processor.read();
-        if (packet instanceof Error) {
+        const packet: IPacketData | DLTError = processor.read();
+        if (packet instanceof DLTError) {
             return packet;
         }
         // Remove already read message from buffer

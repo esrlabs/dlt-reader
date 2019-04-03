@@ -140,28 +140,23 @@ const messages = [
     Buffer.from([61, 170, 0, 118, 77, 71, 72, 83, 0, 0, 3, 138, 0, 135, 41, 230, 33, 1, 78, 65, 80, 83, 72, 65, 68, 84, 0, 4, 0, 0, 86, 0, 17, 2, 78, 0, 78, 0, 0, 0, 48, 132, 13, 0, 138, 3, 0, 0, 255, 127, 0, 0, 0, 0, 162, 0, 67, 71, 101, 110, 105, 118, 105, 83, 101, 110, 115, 111, 114, 32, 45, 32, 105, 110, 118, 97, 108, 105, 100, 32, 116, 105, 99, 107, 101, 115, 32, 112, 101, 114, 32, 114, 101, 118, 111, 108, 117, 116, 105, 111, 110, 44, 32, 118, 97, 108, 105, 100, 105, 116, 121, 66, 105, 116, 115, 58, 48, 0]),
     Buffer.from([61, 171, 0, 118, 77, 71, 72, 83, 0, 0, 3, 138, 0, 135, 41, 230, 33, 1, 78, 65, 80, 83, 72, 65, 68, 84, 0, 4, 0, 0, 86, 0, 17, 2, 78, 0, 78, 0, 0, 0, 48, 132, 13, 0, 138, 3, 0, 0, 255, 127, 0, 0, 0, 0, 162, 0, 67, 71, 101, 110, 105, 118, 105, 83, 101, 110, 115, 111, 114, 32, 45, 32, 105, 110, 118, 97, 108, 105, 100, 32, 116, 105, 99, 107, 101, 115, 32, 112, 101, 114, 32, 114, 101, 118, 111, 108, 117, 116, 105, 111, 110, 44, 32, 118, 97, 108, 105, 100, 105, 116, 121, 66, 105, 116, 115, 58, 48, 0])
 ];
-describe('test name', () => {
+describe('DLT Reader tests', () => {
 
-    it('stage name', (done: Function)=>{
+    it('Read buffer with messages', (done: Function)=>{
         const dltbuffer: DLTBuffer = new DLTBuffer();
         let counter: number = messages.length;
         dltbuffer.on(DLTBuffer.Events.error, (error: Error) => {
-            console.log(`Error on: ${counter}`);
+            console.log(`Error on chunk #: ${messages.length - counter}`);
+            expect(true).toBe(false);
         });
         dltbuffer.on(DLTBuffer.Events.packet, (packet: IPacketData) => {
-            console.log(`Parsed: ${counter}`);
+            console.log(`Parsed chunk #: ${messages.length - counter}`);
             counter -= 1;
             if (counter === 0) {
                 done();
             }
         });
         dltbuffer.add(Buffer.concat(messages));
-        /*
-        messages.forEach((message: Buffer, index: number) => {
-            console.log(`\n\nINDEX: ${index}`);
-            dltbuffer.add(message);
-        });
-        */
     });
 
 });

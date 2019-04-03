@@ -1,9 +1,5 @@
-examples
-docs
 .vscode
 spec
-jakefile
 src
-logo.ascii
-TODO
+lifetest
 README.md

@@ -2,6 +2,7 @@ import { Buffer } from 'buffer';
 import * as PayloadConsts from '../dlt.payload.arguments.consts';
 import TypeInfo from '../dlt.payload.argument.type.info';
 import { APayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
+import { DLTError, EErrorCode } from '../dlt.error';
 
 export interface IData {
     value: boolean;
@@ -14,7 +15,7 @@ export default class BOOL extends APayloadTypeProcessor<IData> {
         super(buffer, info, MSBF);
     }
 
-    public read(): IData | Error {
+    public read(): IData | DLTError {
         const name: string | undefined = this._getName();
         const value: boolean = this.readUInt8() === 1;
         return {

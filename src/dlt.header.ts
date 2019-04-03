@@ -1,6 +1,7 @@
 import { Buffer } from 'buffer';
 import * as Standard from './dlt.header.standard';
 import * as Extended from './dlt.header.extended';
+import { DLTError, EErrorCode } from './dlt.error';
 
 export { Standard, Extended };
 
@@ -16,11 +17,11 @@ export default class Header {
         this._buffer = buffer;
     }
 
-    public read(): Error | undefined {
+    public read(): DLTError | undefined {
         // Create standard header first
         this.standard = new Standard.Header(this._buffer);
         // Try to read
-        const readStandardHeaderError: Error | undefined = this.standard.read();
+        const readStandardHeaderError: DLTError | undefined = this.standard.read();
         if (readStandardHeaderError instanceof Error) {
             return readStandardHeaderError;
         }
@@ -30,7 +31,7 @@ export default class Header {
             // Create extended header
             this.extended = new Extended.Header(this._buffer.slice(this._offset, this._buffer.length));
             // Try to read
-            const readExtendedHeaderError: Error | undefined = this.extended.read();
+            const readExtendedHeaderError: DLTError | undefined = this.extended.read();
             if (readExtendedHeaderError instanceof Error) {
                 return readExtendedHeaderError;
             }

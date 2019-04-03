@@ -13,6 +13,7 @@ import STRG from './types/dlt.payload.argument.type.STRG';
 import STRU from './types/dlt.payload.argument.type.STRU';
 import TRAI from './types/dlt.payload.argument.type.TRAI';
 import RAWD from './types/dlt.payload.argument.type.RAWD';
+import { DLTError as Error, EErrorCode } from './dlt.error';
 import * as PayloadConsts from './dlt.payload.arguments.consts';
 
 export {
@@ -37,4 +38,6 @@ export {
     STRU,
     TRAI,
     RAWD,
+    Error,
+    EErrorCode,
 };

@@ -2,6 +2,7 @@ import { Buffer } from 'buffer';
 import Header, { Standard, Extended } from './dlt.header';
 import PayloadNonVerbose from './dlt.payload.nonverbose';
 import PayloadVerbose from './dlt.payload.verbose';
+import { DLTError, EErrorCode } from './dlt.error';
 
 export enum EMode {
     VERBOSE = 'VERBOSE',
@@ -34,9 +35,9 @@ export default class Payload {
         }
     }
 
-    public read(): IPayloadData | Error {
+    public read(): IPayloadData | DLTError {
         const payload: any = this._processor.read();
-        if (payload instanceof Error) {
+        if (payload instanceof DLTError) {
             return payload;
         }
         return {
