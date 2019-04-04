@@ -28,7 +28,7 @@ export default class PayloadVerbose {
             return new DLTError(`NOAR is ${this._NOAR}, but size of buffer is ${this._buffer.length} bytes. Minimal size requered: ${minSize} bytes.`, EErrorCode.PAYLOAD_LEN);
         }
         const result: IArgumentValue[] = [];
-        if (this._buffer.length === 0) {
+        if (this._buffer.length === 0 || this._NOAR === 0) {
             return result;
         }
         do {
