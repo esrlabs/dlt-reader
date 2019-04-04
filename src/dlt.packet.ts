@@ -51,4 +51,12 @@ export default class Packet {
     public crop(): Buffer {
         return this._buffer.slice(this._length, this._buffer.length);
     }
+
+    public static cabBeParsed(buffer: Buffer): boolean {
+        const length: number | undefined = Standard.Header.getLength(buffer);
+        if (length === undefined) {
+            return false;
+        }
+        return buffer.length >= length;
+    }
 }

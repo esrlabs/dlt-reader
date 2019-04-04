@@ -20,20 +20,31 @@ export default class DLTBuffer extends EventEmitter {
 
     public add(buffer: Buffer) {
         this._buffer = Buffer.concat([this._buffer, buffer]);
-        let error: DLTError | undefined;
+        let packet: DLTError | IPacketData | undefined;
         do {
-            error = this._read();
-            if (error instanceof DLTError) {
-                this.emit(DLTBuffer.Events.error, error);
+            packet = this._read();
+            if (packet instanceof DLTError) {
+                // Error during parsing
+                this.emit(DLTBuffer.Events.error, packet);
                 break;
             }
+            if (packet === undefined) {
+                // Buffer size doesn't have "body" of message
+                break;
+            }
+            // Trigger event
+            this.emit(DLTBuffer.Events.packet, packet);
             if (this._buffer.length === 0) {
+                // Buffer is read completely
                 break;
             }
         } while (true);
     }
 
-    private _read(): DLTError | undefined {
+    private _read(): DLTError | IPacketData | undefined {
+        if (!Packet.cabBeParsed(this._buffer)) {
+            return undefined;
+        }
         const processor: Packet = new Packet(this._buffer);
         const packet: IPacketData | DLTError = processor.read();
         if (packet instanceof DLTError) {
@@ -41,8 +52,7 @@ export default class DLTBuffer extends EventEmitter {
         }
         // Remove already read message from buffer
         this._buffer = processor.crop();
-        // Trigger event
-        this.emit(DLTBuffer.Events.packet, packet);
+        return packet;
     }
 
 }

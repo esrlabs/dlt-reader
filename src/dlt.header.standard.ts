@@ -90,4 +90,11 @@ export class Header extends ABufferReader {
         return this._offset;
     }
 
+    public static getLength(buffer: Buffer): number | undefined {
+        if (buffer.length < Parameters.MIN_LEN) {
+            return undefined;
+        }
+        return buffer.readUInt16BE(2);
+    }
+
 }
