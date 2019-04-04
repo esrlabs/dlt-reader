@@ -28,23 +28,20 @@ export default class PayloadVerbose {
             return new DLTError(`NOAR is ${this._NOAR}, but size of buffer is ${this._buffer.length} bytes. Minimal size requered: ${minSize} bytes.`, EErrorCode.PAYLOAD_LEN);
         }
         const result: IArgumentValue[] = [];
+        if (this._buffer.length === 0) {
+            return result;
+        }
         do {
-            if (this._buffer.length === 0 && result.length !== this._NOAR) {
-                return new DLTError(`Buffer is over, but not all arguments are parsed.`, EErrorCode.NOT_ALL_ARGS_PARSED);
-            } else if (this._buffer.length === 0 || result.length === this._NOAR) {
-                break;
-            } else {
-                const argument: PayloadArgument = new PayloadArgument(this._buffer, this._MSBF);
-                const data: IArgumentData | DLTError = argument.read();
-                if (data instanceof DLTError) {
-                    return data;
-                }
-                this._buffer = data.cropped;
-                result.push({
-                    type: data.type,
-                    data: data.data,
-                });
+            const argument: PayloadArgument = new PayloadArgument(this._buffer, this._MSBF);
+            const data: IArgumentData | DLTError = argument.read();
+            if (data instanceof DLTError) {
+                return data;
             }
+            this._buffer = data.cropped;
+            result.push({
+                type: data.type,
+                data: data.data,
+            });
         } while (this._buffer.length > 0 || result.length < this._NOAR);
         return result;
     }
