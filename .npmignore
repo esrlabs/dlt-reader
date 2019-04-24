@@ -1,7 +1,8 @@
 .vscode
 spec
 src
-lifetest
+lifetest.demon
+lifetest.file
 tsconfig.ts
 tsling.json
 README.md
