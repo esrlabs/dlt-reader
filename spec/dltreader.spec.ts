@@ -159,4 +159,28 @@ describe('DLT Reader tests', () => {
         dltbuffer.add(Buffer.concat(messages));
     });
 
+    it('Read "twice" same buffer', (done: Function)=>{
+        const dltbuffer: DLTBuffer = new DLTBuffer();
+        let times = 10;
+        dltbuffer.on(DLTBuffer.Events.error, (error: Error) => {
+            console.log(`Error attempt ${times}`);
+            expect(true).toBe(false);
+        });
+        dltbuffer.on(DLTBuffer.Events.packet, (packet: IPacketData) => {
+            console.log(`Parsed buffer ${times} times`);
+            if (times === 0) {
+                done();
+            } else {
+                run();
+            }
+        });
+        function run() {
+            setTimeout(() => {
+                dltbuffer.add(messages[30]);
+            }, 200);
+            times -= 1;
+        }
+        run();
+    });
+
 });

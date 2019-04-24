@@ -25,6 +25,15 @@ export enum EMSTP {
     UNDEFINED           = 'UNDEFINED',
 }
 
+export enum EMSTPShort {
+    DLT_TYPE_LOG        = 'LOG',
+    DLT_TYPE_APP_TRACE  = 'APP_TRACE',
+    DLT_TYPE_NW_TRACE   = 'NW_TRACE',
+    DLT_TYPE_CONTROL    = 'CONTROL',
+    // Default
+    UNDEFINED           = 'UNDEFINED',
+}
+
 const MSTPMap: { [key: number]: EMSTP } = {
     0x00: EMSTP.DLT_TYPE_LOG,
     0x01: EMSTP.DLT_TYPE_APP_TRACE,
@@ -59,6 +68,33 @@ export enum EMTIN {
     UNDEFINED               = 'UNDEFINED',
 }
 
+export enum EMTINShort {
+    // If MSTP == DLT_TYPE_LOG
+    DLT_LOG_FATAL           = 'FATAL',
+    DLT_LOG_ERROR           = 'ERROR',
+    DLT_LOG_WARN            = 'WARN',
+    DLT_LOG_INFO            = 'INFO',
+    DLT_LOG_DEBUG           = 'DEBUG',
+    DLT_LOG_VERBOSE         = 'VERBOSE',
+    // If MSTP == DLT_TYPE_APP_TRACE
+    DLT_TRACE_VARIABLE      = 'VARIABLE',
+    DLT_TRACE_FUNCTION_IN   = 'FUNCTION_IN',
+    DLT_TRACE_FUNCTION_OUT  = 'FUNCTION_OUT',
+    DLT_TRACE_STATE         = 'STATE',
+    DLT_TRACE_VFB           = 'VFB',
+    // If MSTP == DLT_TYPE_NW_TRACE
+    DLT_NW_TRACE_IPC        = 'IPC',
+    DLT_NW_TRACE_CAN        = 'CAN',
+    DLT_NW_TRACE_FLEXRAY    = 'FLEXRAY',
+    DLT_NW_TRACE_MOST       = 'MOST',
+    // If MSTP == DLT_TYPE_CONTROL
+    DLT_CONTROL_REQUEST     = 'REQUEST',
+    DLT_CONTROL_RESPONSE    = 'RESPONSE',
+    DLT_CONTROL_TIME        = 'TIME',
+    // Default
+    UNDEFINED               = 'UNDEFINED',
+}
+
 const MTINMap: { [key: string]: { [key: number]: EMTIN } } = {
     [EMSTP.DLT_TYPE_LOG]: {
         0x01: EMTIN.DLT_LOG_FATAL,
@@ -87,6 +123,16 @@ const MTINMap: { [key: string]: { [key: number]: EMTIN } } = {
         0x03: EMTIN.DLT_CONTROL_TIME,
     },
 };
+
+export interface IToStringOptions {
+    MSIN?: boolean;
+    VERB?: boolean;
+    MSTP?: boolean;
+    MTIN?: boolean;
+    NOAR?: boolean;
+    APID?: boolean;
+    CTID?: boolean;
+}
 
 export class Header extends ABufferReader {
 
@@ -130,5 +176,34 @@ export class Header extends ABufferReader {
 
     public getOffset(): number {
         return this._offset;
+    }
+
+    public toString(delimiter: string = ' ', options?: IToStringOptions): string {
+        options = options === undefined ? {
+            MSIN: false,
+            VERB: false,
+            MSTP: true,
+            MTIN: true,
+            NOAR: true,
+            APID: true,
+            CTID: true,
+        } : options;
+        let str: string = '';
+        let count: number = 0;
+        Object.keys(options).forEach((key: string) => {
+            if (!(options as any)[key] || (this as any)[key] === undefined) {
+                return;
+            }
+            const value: any = (this as any)[key];
+            if (key === 'MSTP' && EMSTPShort[value] !== undefined) {
+                str += `${count > 0 ? delimiter : ''}${EMSTPShort[value]}`;
+            } else if (key === 'MTIN' && EMTINShort[value] !== undefined) {
+                str += `${count > 0 ? delimiter : ''}${EMTINShort[value]}`;
+            } else {
+                str += `${count > 0 ? delimiter : ''}${value === undefined ? '' : value}`;
+            }
+            count += 1;
+        });
+        return str;
     }
 }

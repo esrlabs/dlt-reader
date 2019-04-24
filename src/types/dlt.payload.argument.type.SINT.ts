@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import * as PayloadConsts from '../dlt.payload.arguments.consts';
 import TypeInfo from '../dlt.payload.argument.type.info';
 import { APayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
@@ -18,16 +17,19 @@ interface IPointData {
 
 export default class SINT extends APayloadTypeProcessor<IData> {
 
+    private _value: number | undefined;
+    private _name: string | undefined;
+    private _unit: string | undefined;
+
     constructor(buffer: Buffer, info: TypeInfo, MSBF: boolean) {
         super(buffer, info, MSBF);
     }
 
     public read(): IData | DLTError {
-        const result: IData = { name: undefined, unit: undefined, value: 0 };
         const names: { name: string | undefined, unit: string | undefined } = this._getName();
         const point: IPointData = this._getPoint();
-        result.name = names.name;
-        result.unit = names.unit;
+        this._name = names.name;
+        this._unit = names.unit;
         if (point. quantization !== undefined) {
             // TODO: implementation for this case
             // return result;
@@ -40,8 +42,18 @@ export default class SINT extends APayloadTypeProcessor<IData> {
             case 4: byteCount = 8; break;
             case 5: byteCount = 16; break;
         }
-        result.value = this.readInt(byteCount);
-        return result;
+        this._value = this.readInt(byteCount);
+        return { name: this._name, unit: this._unit, value: this._value };
+    }
+
+    public toString(): string {
+        if (this._name === undefined && this._unit === undefined) {
+            return `${this._value}`;
+        } else if (this._name === undefined) {
+            return `${this._unit}=${this._value}`;
+        } else {
+            return `${this._name}: ${this._unit}=${this._value}`;
+        }
     }
 
     public crop(): Buffer {

@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import * as PayloadConsts from '../dlt.payload.arguments.consts';
 import TypeInfo from '../dlt.payload.argument.type.info';
 import { APayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argument.type.processor';
@@ -23,6 +22,10 @@ export default class STRG extends APayloadTypeProcessor<IData> {
         // Here is implementation
         this._offset += length;
         return result;
+    }
+
+    public toString(): string {
+        return '';
     }
 
     public crop(): Buffer {

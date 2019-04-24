@@ -1,9 +1,7 @@
 // tslint:disable:max-classes-per-file
 
 import TypeInfo from "../dlt.payload.argument.type.info";
-import { Buffer } from 'buffer';
 import { DLTError } from '../dlt.error';
-import * as util from 'util';
 
 export abstract class ABufferReader {
 
@@ -16,10 +14,10 @@ export abstract class ABufferReader {
         this._buffer = buffer;
     }
 
-    public readInt8(): number {
+    public readInt8(MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readInt8(this._offset) : this._buffer.readInt8(this._offset);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readInt8(this._offset) : this._buffer.readInt8(this._offset);
             this._offset += 1;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -27,10 +25,10 @@ export abstract class ABufferReader {
         return value;
     }
 
-    public readInt16(): number {
+    public readInt16(MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readInt16BE(this._offset) : this._buffer.readInt16LE(this._offset);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readInt16BE(this._offset) : this._buffer.readInt16LE(this._offset);
             this._offset += 2;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -38,10 +36,10 @@ export abstract class ABufferReader {
         return value;
     }
 
-    public readInt32(): number {
+    public readInt32(MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readInt32BE(this._offset) : this._buffer.readInt32LE(this._offset);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readInt32BE(this._offset) : this._buffer.readInt32LE(this._offset);
             this._offset += 4;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -49,10 +47,10 @@ export abstract class ABufferReader {
         return value;
     }
 
-    public readInt(byteLength: number): number {
+    public readInt(byteLength: number, MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readIntBE(this._offset, byteLength) : this._buffer.readIntLE(this._offset, byteLength);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readIntBE(this._offset, byteLength) : this._buffer.readIntLE(this._offset, byteLength);
             this._offset += byteLength;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -60,10 +58,10 @@ export abstract class ABufferReader {
         return value;
     }
 
-    public readUInt8(): number {
+    public readUInt8(MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readUInt8(this._offset) : this._buffer.readUInt8(this._offset);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readUInt8(this._offset) : this._buffer.readUInt8(this._offset);
             this._offset += 1;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -71,10 +69,10 @@ export abstract class ABufferReader {
         return value;
     }
 
-    public readUInt16(): number {
+    public readUInt16(MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readUInt16BE(this._offset) : this._buffer.readUInt16LE(this._offset);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readUInt16BE(this._offset) : this._buffer.readUInt16LE(this._offset);
             this._offset += 2;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -82,10 +80,10 @@ export abstract class ABufferReader {
         return value;
     }
 
-    public readUInt32(): number {
+    public readUInt32(MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readUInt32BE(this._offset) : this._buffer.readUInt32LE(this._offset);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readUInt32BE(this._offset) : this._buffer.readUInt32LE(this._offset);
             this._offset += 4;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -93,10 +91,10 @@ export abstract class ABufferReader {
         return value;
     }
 
-    public readUInt(byteLength: number): number {
+    public readUInt(byteLength: number, MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readUIntBE(this._offset, byteLength) : this._buffer.readUIntLE(this._offset, byteLength);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readUIntBE(this._offset, byteLength) : this._buffer.readUIntLE(this._offset, byteLength);
             this._offset += byteLength;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -104,10 +102,10 @@ export abstract class ABufferReader {
         return value;
     }
 
-    public readFloat(): number {
+    public readFloat(MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readFloatBE(this._offset) : this._buffer.readFloatLE(this._offset);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readFloatBE(this._offset) : this._buffer.readFloatLE(this._offset);
             this._offset += 4;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -115,10 +113,10 @@ export abstract class ABufferReader {
         return value;
     }
 
-    public readDouble(): number {
+    public readDouble(MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = this._MSBF ? this._buffer.readDoubleBE(this._offset) : this._buffer.readDoubleLE(this._offset);
+            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readDoubleBE(this._offset) : this._buffer.readDoubleLE(this._offset);
             this._offset += 8;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -143,6 +141,7 @@ export abstract class APayloadTypeProcessor<T> extends ABufferReader {
     }
 
     public abstract read(): T | DLTError;
+    public abstract toString(): string;
     public abstract crop(): Buffer;
 
 }

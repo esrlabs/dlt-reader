@@ -19,6 +19,14 @@ export const HeaderStandardMasks = {
     VERS: 0b11100000,
 };
 
+export interface IToStringOptions {
+    VERS?: boolean;
+    SID?: boolean;
+    MCNT?: boolean;
+    TMS?: boolean;
+    EID?: boolean;
+}
+
 /**
  * @class Header
  * @classdesc StandardHeader
@@ -84,6 +92,27 @@ export class Header extends ABufferReader {
         if (this.WTMS) {
             this.TMS = this.readUInt32();
         }
+    }
+
+    public toString(delimiter: string = ' ', options?: IToStringOptions): string {
+        options = options === undefined ? {
+            VERS: false,
+            SID: true,
+            MCNT: false,
+            TMS: true,
+            EID: true,
+        } : options;
+        let str: string = '';
+        let count: number = 0;
+        Object.keys(options).forEach((key: string) => {
+            if (!(options as any)[key] || (this as any)[key] === undefined) {
+                return;
+            }
+            const value: any = (this as any)[key];
+            str += `${count > 0 ? delimiter : ''}${value === undefined ? '' : value }`;
+            count += 1;
+        });
+        return str;
     }
 
     public getOffset(): number {

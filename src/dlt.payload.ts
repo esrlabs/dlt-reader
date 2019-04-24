@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import Header, { Standard, Extended } from './dlt.header';
 import PayloadNonVerbose from './dlt.payload.nonverbose';
 import PayloadVerbose, { IArgumentValue } from './dlt.payload.verbose';
@@ -35,8 +34,8 @@ export default class Payload {
         }
     }
 
-    public read(): IPayloadData | DLTError {
-        const payload: any = this._processor.read();
+    public read(includeStrValue: boolean = false): IPayloadData | DLTError {
+        const payload: any = this._processor.read(includeStrValue);
         if (payload instanceof DLTError) {
             return payload;
         }

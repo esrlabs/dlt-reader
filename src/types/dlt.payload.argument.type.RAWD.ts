@@ -5,23 +5,33 @@ import { APayloadTypeProcessor } from '../interfaces/interface.dlt.payload.argum
 import { DLTError, EErrorCode } from '../dlt.error';
 
 export interface IData {
-    value: Buffer;
+    value: Buffer | undefined;
     name: string | undefined;
 }
 
 export default class RAWD extends APayloadTypeProcessor<IData> {
+
+    private _value: Buffer | undefined;
+    private _name: string | undefined;
 
     constructor(buffer: Buffer, info: TypeInfo, MSBF: boolean) {
         super(buffer, info, MSBF);
     }
 
     public read(): IData | DLTError {
-        const result: IData = { value: new Buffer(0), name: undefined };
         const length: number = this.readUInt16();
-        result.name = this._getName();
-        result.value = this._buffer.slice(this._offset, this._offset + length);
+        this._name = this._getName();
+        this._value = this._buffer.slice(this._offset, this._offset + length);
         this._offset += length;
-        return result;
+        return { value: this._value, name: this._name };
+    }
+
+    public toString(): string {
+        if (this._name === undefined) {
+            return `[${Uint8Array.from((this._value as Buffer)).join(' ')}]`;
+        } else {
+            return `${this._name}: [${Uint8Array.from((this._value as Buffer)).join(' ')}]`;
+        }
     }
 
     public crop(): Buffer {

@@ -1,7 +1,6 @@
 
 import * as Net from 'net';
 import * as DLT from '../../src/index';
-import * as util from 'util';
 import { StdoutController } from 'custom.stdout';
 
 const DLT_DEMON_IP = '172.16.224.128';

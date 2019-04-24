@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import * as PayloadConsts from './dlt.payload.arguments.consts';
 import TypeInfo from './dlt.payload.argument.type.info';
 import { APayloadTypeProcessor } from './interfaces/interface.dlt.payload.argument.type.processor';
@@ -29,6 +28,7 @@ export const EType = PayloadConsts.EType;
 export interface IArgumentData {
     type: PayloadConsts.EType;
     data: any;
+    str?: string;
     cropped: Buffer;
 }
 
@@ -47,7 +47,7 @@ export default class PayloadArgument {
         this._MSBF = MSBF;
     }
 
-    public read(): IArgumentData | DLTError {
+    public read(includeStrValue: boolean = false): IArgumentData | DLTError {
         // Get type info
         this._info = new TypeInfo(this._buffer, this._MSBF);
         const readTypeInfoError: DLTError | undefined = this._info.read();
@@ -73,6 +73,9 @@ export default class PayloadArgument {
             data: data,
             cropped: this._processor.crop(),
         };
+        if (includeStrValue) {
+            results.str = this._processor.toString();
+        }
         this._processor = undefined;
         return results;
     }

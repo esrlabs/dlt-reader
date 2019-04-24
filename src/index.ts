@@ -1,9 +1,11 @@
 import Buffer, { IPacketData } from './dlt.buffer';
 import Header, { Standard, Extended } from './dlt.header';
+import { Header as FrontHeader } from './dlt.header.front';
 import Payload, { IPayloadData } from './dlt.payload';
 import PayloadNonVerbose from './dlt.payload.nonverbose';
 import PayloadVerbose, { IArgumentValue } from './dlt.payload.verbose';
 import PayloadArgument, { IArgumentData } from './dlt.payload.argument';
+import TransformStream from './dlt.stream.transform';
 import TypeInfo from './dlt.payload.argument.type.info';
 import BOOL from './types/dlt.payload.argument.type.BOOL';
 import FLOA from './types/dlt.payload.argument.type.FLOA';
@@ -15,11 +17,13 @@ import TRAI from './types/dlt.payload.argument.type.TRAI';
 import RAWD from './types/dlt.payload.argument.type.RAWD';
 import { DLTError as Error, EErrorCode } from './dlt.error';
 import * as PayloadConsts from './dlt.payload.arguments.consts';
+import NullWritableStream from './tools/stream.writable.null';
 
 export {
     Buffer,
     IPacketData,
     Header,
+    FrontHeader,
     Standard,
     Extended,
     Payload,
@@ -31,6 +35,7 @@ export {
     IArgumentValue,
     PayloadConsts,
     TypeInfo,
+    TransformStream,
     BOOL,
     FLOA,
     UINT,
@@ -41,4 +46,5 @@ export {
     RAWD,
     Error,
     EErrorCode,
+    NullWritableStream,
 };

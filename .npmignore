@@ -2,4 +2,6 @@
 spec
 src
 lifetest
+tsconfig.ts
+tsling.json
 README.md

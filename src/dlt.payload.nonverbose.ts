@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import { DLTError, EErrorCode } from './dlt.error';
 
 export default class PayloadNonVerbose {
@@ -16,7 +15,7 @@ export default class PayloadNonVerbose {
         this._offset += 4;
     }
 
-    public read(): any {
+    public read(includeStrValue: boolean = false): any {
         return null;
     }
 

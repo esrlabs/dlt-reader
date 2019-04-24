@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import PayloadArgument, { IArgumentData } from './dlt.payload.argument';
 import * as PayloadConsts from './dlt.payload.arguments.consts';
 import { DLTError, EErrorCode } from './dlt.error';
@@ -6,6 +5,7 @@ import { DLTError, EErrorCode } from './dlt.error';
 export interface IArgumentValue {
     type: PayloadConsts.EType;
     data: any;
+    str?: string;
 }
 
 export default class PayloadVerbose {
@@ -20,7 +20,7 @@ export default class PayloadVerbose {
         this._MSBF = MSBF;
     }
 
-    public read(): IArgumentValue[] | DLTError {
+    public read(includeStrValue: boolean = false): IArgumentValue[] | DLTError {
         // Calculate minimal size of buffer. Size of TypeInfo is 4 bytes; TypeInfo should be presend for each argument
         const minSize: number = 4 * this._NOAR;
         // Check length of buffer
@@ -33,15 +33,19 @@ export default class PayloadVerbose {
         }
         do {
             const argument: PayloadArgument = new PayloadArgument(this._buffer, this._MSBF);
-            const data: IArgumentData | DLTError = argument.read();
+            const data: IArgumentData | DLTError = argument.read(includeStrValue);
             if (data instanceof DLTError) {
                 return data;
             }
             this._buffer = data.cropped;
-            result.push({
+            const res: IArgumentValue = {
                 type: data.type,
                 data: data.data,
-            });
+            };
+            if (includeStrValue) {
+                res.str = data.str;
+            }
+            result.push(res);
         } while (this._buffer.length > 0 || result.length < this._NOAR);
         return result;
     }

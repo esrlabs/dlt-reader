@@ -41,8 +41,13 @@ export default class DLTBuffer extends EventEmitter {
         } while (true);
     }
 
+    public destroy() {
+        // Drop buffer
+        this._buffer = new Buffer(0);
+    }
+
     private _read(): DLTError | IPacketData | undefined {
-        if (!Packet.cabBeParsed(this._buffer)) {
+        if (!Packet.canBeParsed(this._buffer)) {
             return undefined;
         }
         const processor: Packet = new Packet(this._buffer);

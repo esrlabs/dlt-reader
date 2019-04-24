@@ -19,7 +19,7 @@ export default class Packet {
         this._buffer = buffer;
     }
 
-    public read(): IPacketData | DLTError {
+    public read(includeStrValue: boolean = false): IPacketData | DLTError {
         // Create header
         const header: Header = new Header(this._buffer);
         // Try to read header
@@ -36,7 +36,7 @@ export default class Packet {
         // Create payload processor
         const processor: Payload = new Payload(payloadBuffer, header);
         // Read payload data
-        const payload: IPayloadData | DLTError = processor.read();
+        const payload: IPayloadData | DLTError = processor.read(includeStrValue);
         if (payload instanceof DLTError) {
             return payload;
         }
@@ -52,7 +52,7 @@ export default class Packet {
         return this._buffer.slice(this._length, this._buffer.length);
     }
 
-    public static cabBeParsed(buffer: Buffer): boolean {
+    public static canBeParsed(buffer: Buffer): boolean {
         const length: number | undefined = Standard.Header.getLength(buffer);
         if (length === undefined) {
             return false;
