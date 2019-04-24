@@ -3,6 +3,8 @@
 import TypeInfo from "../dlt.payload.argument.type.info";
 import { DLTError } from '../dlt.error';
 
+const BIT32 = 4294967296;
+
 export abstract class ABufferReader {
 
     public readonly _buffer: Buffer;
@@ -50,7 +52,39 @@ export abstract class ABufferReader {
     public readInt(byteLength: number, MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readIntBE(this._offset, byteLength) : this._buffer.readIntLE(this._offset, byteLength);
+            if ((MSBF === undefined ? this._MSBF : MSBF)) {
+                // BE
+                switch (byteLength) {
+                    case 4:
+                        value = this._buffer.readIntBE(this._offset, byteLength);
+                        break;
+                    case 8:
+                        let high = this._buffer.readInt32BE(this._offset);
+                        const low = this._buffer.readInt32BE(this._offset + 4);
+                        high |= 0; // a trick to get signed
+                        value = high ? (high * BIT32 + low) : low;
+                        break;
+                    case 16:
+                        value = 0;
+                        break;
+                }
+            } else {
+                // LE
+                switch (byteLength) {
+                    case 4:
+                        value = this._buffer.readIntLE(this._offset, byteLength);
+                        break;
+                    case 8:
+                        let high = this._buffer.readInt32LE(this._offset + 4);
+                        const low = this._buffer.readInt32LE(this._offset);
+                        high |= 0; // a trick to get signed
+                        value = high ? (high * BIT32 + low) : low;
+                        break;
+                    case 16:
+                        value = 0;
+                        break;
+                }
+            }
             this._offset += byteLength;
         } catch (extractError) {
             this._postErrorData(extractError);
@@ -94,7 +128,37 @@ export abstract class ABufferReader {
     public readUInt(byteLength: number, MSBF?: boolean): number {
         let value: number = 0;
         try {
-            value = (MSBF === undefined ? this._MSBF : MSBF) ? this._buffer.readUIntBE(this._offset, byteLength) : this._buffer.readUIntLE(this._offset, byteLength);
+            if ((MSBF === undefined ? this._MSBF : MSBF)) {
+                // BE
+                switch (byteLength) {
+                    case 4:
+                        value = this._buffer.readUIntBE(this._offset, byteLength);
+                        break;
+                    case 8:
+                        const high = this._buffer.readUInt32BE(this._offset);
+                        const low = this._buffer.readUInt32BE(this._offset + 4);
+                        value = high ? (high * BIT32 + low) : low;
+                        break;
+                    case 16:
+                        value = 0;
+                        break;
+                }
+            } else {
+                // LE
+                switch (byteLength) {
+                    case 4:
+                        value = this._buffer.readUIntLE(this._offset, byteLength);
+                        break;
+                    case 8:
+                        const high = this._buffer.readUInt32LE(this._offset + 4);
+                        const low = this._buffer.readUInt32LE(this._offset);
+                        value = high ? (high * BIT32 + low) : low;
+                        break;
+                    case 16:
+                        value = 0;
+                        break;
+                }
+            }
             this._offset += byteLength;
         } catch (extractError) {
             this._postErrorData(extractError);
