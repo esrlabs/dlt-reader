@@ -15,6 +15,7 @@ export type TConvertorFunc = (packets: IStoredPacket[]) => Buffer | string;
 export interface IOptions {
     stopOnError?: boolean;
     stringify?: boolean;
+    datetime?: boolean;
     convertor?: TConvertorFunc | undefined;
 }
 
@@ -33,6 +34,7 @@ export default class DLTFileReadStream extends Transform {
     private _options: IOptions = {
         stopOnError: false,
         stringify: false,
+        datetime: false,
         convertor: undefined,
     };
 
@@ -119,7 +121,7 @@ export default class DLTFileReadStream extends Transform {
         }
         let str: string | undefined;
         if (this._options.stringify) {
-            str = `${this._header.timestamp.unixstamp} ${this._header.ECUID} ${packet.standardHeader.toString()}`;
+            str = `${this._getDatetime(this._header.timestamp.unixstamp)} ${this._header.ECUID} ${packet.standardHeader.toString()}`;
             if (packet.extendedHeader !== undefined) {
                 str += ' ' + packet.extendedHeader.toString();
             }
@@ -135,6 +137,19 @@ export default class DLTFileReadStream extends Transform {
         // Drop header
         this._header = undefined;
         return result;
+    }
+
+    private _getDatetime(unixstamp: number): string {
+        if (this._options.datetime) {
+            const date: Date = new Date(unixstamp);
+            return this._isDateValid(date) ? `${date.toLocaleString()}` : `${unixstamp}`;
+        } else {
+            return `${unixstamp}`;
+        }
+    }
+
+    private _isDateValid(date: Date) {
+        return date instanceof Date && !isNaN(date.getTime());
     }
 
 }
