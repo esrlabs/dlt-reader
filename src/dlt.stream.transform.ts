@@ -142,7 +142,7 @@ export default class DLTFileReadStream extends Transform {
     private _getDatetime(unixstamp: number): string {
         if (this._options.datetime) {
             const date: Date = new Date(unixstamp);
-            return this._isDateValid(date) ? `${date.toLocaleString()}` : `${unixstamp}`;
+            return this._isDateValid(date) ? `${date.toLocaleString()}.${date.getMilliseconds()}` : `${unixstamp}`;
         } else {
             return `${unixstamp}`;
         }
