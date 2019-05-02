@@ -1,6 +1,6 @@
 {
   "name": "dltreader",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Diagnostic Log and Trace format reader",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
