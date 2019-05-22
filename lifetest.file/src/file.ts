@@ -6,9 +6,8 @@ const started: number = Date.now();
 
 const file: string = '/Users/dmitry.astafyev/WebstormProjects/logviewer/logs_examples/DTC_SP21.dlt';
 
-const tranform: DLT.TransformStream = new DLT.TransformStream({}, { stringify: true, datetime: true });
+const tranform: DLT.TransformStream = new DLT.TransformStream({}, { stringify: true, columnsDelimiter: '|', argumentsDelimiter: '!' });
 const writer: DLT.NullWritableStream = new DLT.NullWritableStream(true);
-
 const reader: fs.ReadStream = fs.createReadStream(file);
 
 tranform.on(DLT.TransformStream.Events.chunk, (bytes, packets) => {

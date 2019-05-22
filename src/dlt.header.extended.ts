@@ -1,6 +1,6 @@
-import { Buffer } from 'buffer';
 import { ABufferReader } from './interfaces/interface.dlt.payload.argument.type.processor';
 import { DLTError, EErrorCode } from './dlt.error';
+import { EColumn } from './dlt.packet';
 
 export const Parameters = {
     MIN_LEN: 10,
@@ -178,26 +178,18 @@ export class Header extends ABufferReader {
         return this._offset;
     }
 
-    public toString(delimiter: string = ' ', options?: IToStringOptions): string {
-        options = options === undefined ? {
-            MSIN: false,
-            VERB: false,
-            MSTP: true,
-            MTIN: true,
-            NOAR: true,
-            APID: true,
-            CTID: true,
-        } : options;
+    public toString(delimiter: string = ' ', columns?: EColumn[]): string {
+        columns = columns === undefined ? [EColumn.MSIN, EColumn.VERB, EColumn.MSTP, EColumn.MTIN, EColumn.NOAR, EColumn.APID, EColumn.CTID] : columns;
         let str: string = '';
         let count: number = 0;
-        Object.keys(options).forEach((key: string) => {
-            if (!(options as any)[key] || (this as any)[key] === undefined) {
+        columns.forEach((column: EColumn) => {
+            if ((this as any)[column] === undefined) {
                 return;
             }
-            const value: any = (this as any)[key];
-            if (key === 'MSTP' && EMSTPShort[value] !== undefined) {
+            const value: any = (this as any)[column];
+            if (column === EColumn.MSTP && EMSTPShort[value] !== undefined) {
                 str += `${count > 0 ? delimiter : ''}${EMSTPShort[value]}`;
-            } else if (key === 'MTIN' && EMTINShort[value] !== undefined) {
+            } else if (column === EColumn.MSIN && EMTINShort[value] !== undefined) {
                 str += `${count > 0 ? delimiter : ''}${EMTINShort[value]}`;
             } else {
                 str += `${count > 0 ? delimiter : ''}${value === undefined ? '' : value}`;
@@ -205,5 +197,18 @@ export class Header extends ABufferReader {
             count += 1;
         });
         return str;
+    }
+
+    public getPropAsStr(column: EColumn): string {
+        const value: any = (this as any)[column] === undefined ? '' : (this as any)[column];
+        let result: string;
+        if (column === EColumn.MSTP && EMSTPShort[value] !== undefined) {
+            result = `${EMSTPShort[value]}`;
+        } else if (column === EColumn.MSIN && EMTINShort[value] !== undefined) {
+            result = `${EMTINShort[value]}`;
+        } else {
+            result =  typeof value === 'string' ? value : (typeof value.toString === 'function' ? value.toString() : 'n/d');
+        }
+        return result;
     }
 }

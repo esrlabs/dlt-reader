@@ -3,6 +3,33 @@ import Header, { Standard, Extended } from './dlt.header';
 import Payload, { IPayloadData } from './dlt.payload';
 import { DLTError, EErrorCode } from './dlt.error';
 
+export enum EColumn {
+    ECUID = 'ECUID',        // ECU Id
+    DATETIME = 'DATETIME',  // Generate datetime from unixtime of message
+    // Standard header
+    UEH = 'UEH',            // Use Extended Header
+    MSBF = 'MSBF',          // MSB First: true - payload BE; false - payload LE
+    WEID = 'WEID',          // With ECU ID
+    WSID = 'WSID',          // With Session ID
+    WTMS = 'WTMS',          // With Timestamp
+    VERS = 'VERS',          // Version Number
+    MCNT = 'MCNT',          // Message Counter
+    LEN = 'LEN',            // Length of the complete message in bytes
+    SID = 'SID',            // Session ID
+    TMS = 'TMS',            // Timestamp
+    EID = 'EID',            // ECU ID (ECU)
+    // Extended header
+    MSIN = 'MSIN',          // Message Info
+    VERB = 'VERB',          // Verbose
+    MSTP = 'MSTP',          // Message Type
+    MTIN = 'MTIN',          // Message Type Info
+    NOAR = 'NOAR',          // Number of arguments
+    APID = 'APID',          // Application ID
+    CTID = 'CTID',          // Context ID
+    // Payload
+    PAYLOAD = 'PAYLOAD',    // Payload
+}
+
 export interface IPacketData {
     standardHeader: Standard.Header;
     extendedHeader: Extended.Header | undefined;

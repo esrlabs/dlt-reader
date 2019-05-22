@@ -1,6 +1,8 @@
 import Buffer, { IPacketData } from './dlt.buffer';
 import Header, { Standard, Extended } from './dlt.header';
+import { EMTIN } from './dlt.header.extended';
 import { Header as FrontHeader } from './dlt.header.front';
+import Packet, { EColumn } from './dlt.packet';
 import Payload, { IPayloadData } from './dlt.payload';
 import PayloadNonVerbose from './dlt.payload.nonverbose';
 import PayloadVerbose, { IArgumentValue } from './dlt.payload.verbose';
@@ -20,6 +22,8 @@ import * as PayloadConsts from './dlt.payload.arguments.consts';
 import NullWritableStream from './tools/stream.writable.null';
 
 export {
+    Packet,
+    EColumn,
     Buffer,
     IPacketData,
     Header,
@@ -47,4 +51,5 @@ export {
     Error,
     EErrorCode,
     NullWritableStream,
+    EMTIN,
 };

@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import * as Standard from './dlt.header.standard';
 import * as Extended from './dlt.header.extended';
 import { DLTError, EErrorCode } from './dlt.error';

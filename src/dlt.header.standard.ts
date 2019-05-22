@@ -1,6 +1,6 @@
-import { Buffer } from 'buffer';
 import { ABufferReader } from './interfaces/interface.dlt.payload.argument.type.processor';
 import { DLTError, EErrorCode } from './dlt.error';
+import { EColumn } from './dlt.packet';
 
 export const Parameters = {
     MIN_LEN: 4,
@@ -18,14 +18,6 @@ export const HeaderStandardFlags = {
 export const HeaderStandardMasks = {
     VERS: 0b11100000,
 };
-
-export interface IToStringOptions {
-    VERS?: boolean;
-    SID?: boolean;
-    MCNT?: boolean;
-    TMS?: boolean;
-    EID?: boolean;
-}
 
 /**
  * @class Header
@@ -94,25 +86,24 @@ export class Header extends ABufferReader {
         }
     }
 
-    public toString(delimiter: string = ' ', options?: IToStringOptions): string {
-        options = options === undefined ? {
-            VERS: false,
-            SID: true,
-            MCNT: false,
-            TMS: true,
-            EID: true,
-        } : options;
+    public toString(delimiter: string = ' ', columns?: EColumn[]): string {
+        columns = columns === undefined ? [ EColumn.VERS, EColumn.SID, EColumn.MCNT, EColumn.TMS, EColumn.EID ] : columns;
         let str: string = '';
         let count: number = 0;
-        Object.keys(options).forEach((key: string) => {
-            if (!(options as any)[key] || (this as any)[key] === undefined) {
+        columns.forEach((column: EColumn) => {
+            if ((this as any)[column] === undefined) {
                 return;
             }
-            const value: any = (this as any)[key];
+            const value: any = (this as any)[column];
             str += `${count > 0 ? delimiter : ''}${value === undefined ? '' : value }`;
             count += 1;
         });
         return str;
+    }
+
+    public getPropAsStr(column: EColumn): string {
+        const value: any = (this as any)[column] === undefined ? '' : (this as any)[column];
+        return typeof value === 'string' ? value : (typeof value.toString === 'function' ? value.toString() : 'n/d');
     }
 
     public getOffset(): number {

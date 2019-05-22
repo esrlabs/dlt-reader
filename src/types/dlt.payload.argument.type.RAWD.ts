@@ -28,9 +28,9 @@ export default class RAWD extends APayloadTypeProcessor<IData> {
 
     public toString(): string {
         if (this._name === undefined) {
-            return `[${Uint8Array.from((this._value as Buffer)).join(' ')}]`;
+            return `${Uint8Array.from((this._value as Buffer)).join(' ')}`;
         } else {
-            return `${this._name}: [${Uint8Array.from((this._value as Buffer)).join(' ')}]`;
+            return `${this._name}: ${Uint8Array.from((this._value as Buffer)).join(' ')}`;
         }
     }
 
