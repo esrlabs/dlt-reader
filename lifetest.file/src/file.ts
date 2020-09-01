@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 const started: number = Date.now();
 
-const file: string = '/Users/dmitry.astafyev/WebstormProjects/logviewer/logs_examples/DTC_SP21.dlt';
+const file: string = '_path_to_dlt_file';
 
 const tranform: DLT.TransformStream = new DLT.TransformStream({}, { stringify: true, columnsDelimiter: '|', argumentsDelimiter: '!' });
 const writer: DLT.NullWritableStream = new DLT.NullWritableStream(true);

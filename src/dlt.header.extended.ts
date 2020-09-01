@@ -187,10 +187,10 @@ export class Header extends ABufferReader {
                 return;
             }
             const value: any = (this as any)[column];
-            if (column === EColumn.MSTP && EMSTPShort[value] !== undefined) {
-                str += `${count > 0 ? delimiter : ''}${EMSTPShort[value]}`;
-            } else if (column === EColumn.MSIN && EMTINShort[value] !== undefined) {
-                str += `${count > 0 ? delimiter : ''}${EMTINShort[value]}`;
+            if (column === EColumn.MSTP && this._getEMSTPShort(value) !== undefined) {
+                str += `${count > 0 ? delimiter : ''}${this._getEMSTPShort(value)}`;
+            } else if (column === EColumn.MSIN && this._getEMTINShort(value) !== undefined) {
+                str += `${count > 0 ? delimiter : ''}${this._getEMTINShort(value)}`;
             } else {
                 str += `${count > 0 ? delimiter : ''}${value === undefined ? '' : value}`;
             }
@@ -202,13 +202,21 @@ export class Header extends ABufferReader {
     public getPropAsStr(column: EColumn): string {
         const value: any = (this as any)[column] === undefined ? '' : (this as any)[column];
         let result: string;
-        if (column === EColumn.MSTP && EMSTPShort[value] !== undefined) {
-            result = `${EMSTPShort[value]}`;
-        } else if (column === EColumn.MSIN && EMTINShort[value] !== undefined) {
-            result = `${EMTINShort[value]}`;
+        if (column === EColumn.MSTP && this._getEMSTPShort(value) !== undefined) {
+            result = `${this._getEMSTPShort(value)}`;
+        } else if (column === EColumn.MSIN && this._getEMTINShort(value) !== undefined) {
+            result = `${this._getEMTINShort(value)}`;
         } else {
             result =  typeof value === 'string' ? value : (typeof value.toString === 'function' ? value.toString() : 'n/d');
         }
         return result;
+    }
+
+    private _getEMSTPShort(value: any): EMSTPShort | undefined {
+        return (EMSTPShort as any)[value];
+    }
+
+    private _getEMTINShort(value: any): EMTINShort | undefined {
+        return (EMTINShort as any)[value];
     }
 }

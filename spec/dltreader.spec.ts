@@ -4,7 +4,6 @@
 /// <reference path="../node_modules/@types/node/index.d.ts" />
 
 //./node_modules/.bin/jasmine-ts src/something.spec.ts
-import * as path from 'path';
 import DLTBuffer, { IPacketData } from '../src/dlt.buffer';
 
 const messages = [
