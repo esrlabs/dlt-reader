@@ -12,7 +12,7 @@ export default class DLTBuffer extends EventEmitter {
         error: 'error',
     };
 
-    private _buffer: Buffer = new Buffer(0);
+    private _buffer: Buffer = Buffer.alloc(0);
 
     constructor() {
         super();
@@ -43,7 +43,7 @@ export default class DLTBuffer extends EventEmitter {
 
     public destroy() {
         // Drop buffer
-        this._buffer = new Buffer(0);
+        this._buffer = Buffer.alloc(0);
     }
 
     private _read(): DLTError | IPacketData | undefined {

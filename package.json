@@ -13,7 +13,7 @@
   "author": "Dmitry Astafyev (dmitry.astafyev@esrlabs.com)",
   "license": "Apache 2",
   "devDependencies": {
-    "@types/node": "^10.12.0",
+    "@types/node": "^10.17.29",
     "jasmine": "^3.6.1",
     "jasmine-ts": "^0.3.0",
     "ts-node": "^7.0.0",

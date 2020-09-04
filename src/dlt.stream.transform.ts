@@ -31,7 +31,7 @@ export default class DLTFileReadStream extends Transform {
         error: 'error',
     };
 
-    private _buffer: Buffer = new Buffer(0);
+    private _buffer: Buffer = Buffer.alloc(0);
     private _header: Header | undefined;
     private _packets: number = 0;
     private _bytes: number = 0;
